@@ -9,6 +9,7 @@ public class Constants {
     public static final double kTargetDistance = Math.PI / 3;
     public static final double kDecelThresholdRel = Math.PI / 18;
     public static final double kMaxVelocity = Math.PI / 4;
-    public static final double kDeltaVelocityPeriod = Math.PI / 4;
+    public static final double kFinishedAccelerationPeriod = Math.PI / 4;
     public static final double kDeltaT = 0.02;
+    public static final double kAccelerationTolerance = 0.1;
 }
