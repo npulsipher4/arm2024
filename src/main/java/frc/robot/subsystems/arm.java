@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -14,7 +15,7 @@ public class arm extends SubsystemBase {
   PWM m_armMotor = new PWM(Constants.kArmPWMid);
   DutyCycleEncoder m_armEncoder = new DutyCycleEncoder(Constants.kEncoderChannel);
   PIDController m_armPIDController = new PIDController(Constants.kP, Constants.kI, Constants.kD);
-  double m_relativePositionOffset = 0.0;
+  double m_relativeTimeOffset = 0.0;
   double m_startVelocity = findCurrentVelocity();
   boolean m_prevCycleAcceleration = false;
   double prevDistance = 0;
@@ -39,8 +40,8 @@ public class arm extends SubsystemBase {
 
   }
 
-  private double getRelativeEncoderPos() {
-    return m_armEncoder.getAbsolutePosition() - m_relativePositionOffset;
+  private double getRelativeTime() {
+    return (double)RobotController.getFPGATime() - m_relativeTimeOffset;
   }
 
   private boolean shouldBeAccelerating(double targetVelocity) {
@@ -51,12 +52,21 @@ public class arm extends SubsystemBase {
     return true;
   }
 
+  private double totalDistance(double joystickSpeed, double deltaV) {
+    double distance = (joystickSpeed * deltaV) / 2.0;
+    double position = m_armEncoder.getAbsolutePosition();
+    if ((position > Constants.kTargetDistance && position + distance < Constants.kTargetDistance) ||
+      (position < Constants.kTargetDistance && position + distance > Constants.kTargetDistance)){
+
+    }
+  }
+
   private double calculateVelocity(double joystickSpeed) {
     double targetVelocity = joystickSpeed * Constants.kMaxVelocity;
     if ((findCurrentVelocity() > targetVelocity && targetVelocity >= 0.0) ||
       (findCurrentVelocity() < targetVelocity && targetVelocity <= 0.0) ||
       (!m_prevCycleAcceleration && shouldBeAccelerating(targetVelocity))) {
-        m_relativePositionOffset = m_armEncoder.getAbsolutePosition();
+        m_relativeTimeOffset = (double)RobotController.getFPGATime() / 1000000.0;
         m_startVelocity = findCurrentVelocity();
     }
     double deltaV = targetVelocity - m_startVelocity;
@@ -66,10 +76,10 @@ public class arm extends SubsystemBase {
 
     return (
       3 * deltaV * Math.pow(
-        getRelativeEncoderPos()/distanceScalingFactor,
+        getRelativeTime()/distanceScalingFactor,
         2) + 
       -2 * deltaV * Math.pow( 
-        getRelativeEncoderPos()/distanceScalingFactor,
+        getRelativeTime()/distanceScalingFactor,
         3) + 
       m_startVelocity
     );
