@@ -42,14 +42,22 @@ public class arm extends SubsystemBase {
     m_state = State.OPERATING;
   }
 
-  private void moveArm(double speed) {
     m_armMotor.set(m_armPIDController.calculate(m_armEncoder.getRate(), speed));
+  private void moveArmVel(double speed) {
   }
 
   public void indexArm() {
     m_state = State.CALIBRATING;
     m_startTime = (double)RobotController.getFPGATime()/1000000;
-    moveArm(Constants.kCalibrationSpeed);
+    moveArmVel(Constants.kCalibrationSpeed);
+  }
+
+  private boolean inTolerance(double input, double setPoint, double percentTolerance) {
+    if (input >= setPoint - setPoint * percentTolerance &&
+      input <= setPoint + setPoint * percentTolerance) {
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -66,14 +74,14 @@ public class arm extends SubsystemBase {
         if ((m_armEncoder.getRate() <= 0.0 && m_armEncoder.getRate() >= -Constants.kCalibrationTolerance ||
           m_armEncoder.getRate() >= 0.0 && m_armEncoder.getRate() <= Constants.kCalibrationTolerance) &&
           (double)RobotController.getFPGATime()/1000000 - m_startTime >= Constants.kCalibrationDelay) {
-          moveArm(0.0);
+          moveArmVel(0.0);
           m_armEncoder.reset();
           m_state = State.OPERATING;
         }
         break;
     
       case OPERATING:
-        moveArm(m_speed);
+        moveArmVel(m_speed);
         break;
     }
   }
