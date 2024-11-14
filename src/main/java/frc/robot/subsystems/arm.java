@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -17,39 +18,43 @@ public class arm extends SubsystemBase {
   Encoder m_armEncoder = new Encoder(Constants.kEncoderChannelA, Constants.kEncoderChannelB, false,  EncodingType.k4X);
   Spark m_armMotor = new Spark(Constants.kMotorChannel);
   PIDController m_armPIDController = new PIDController(Constants.kP, Constants.kI, Constants.kD);
-  
-  double m_startTime = 0.00;
-  double m_speed = 0.0;
+  DutyCycleEncoder m_armEncoderPos = new DutyCycleEncoder(Constants.kDutyCycleEncoderChannel);
+
+  double m_startTimeSeconds = 0.00;
+  double m_speedRadiansPerSecond = 0.0;
 
   private enum State {
     CALIBRATING,
-    OPERATING
+    OPERATING,
+    OUT_OF_SCOPE
   }
 
   private State m_state = State.CALIBRATING;
 
   public arm() {
-    m_armEncoder.setDistancePerPulse(Constants.kArmDistancePerPulse);
+    m_armEncoder.setDistancePerPulse(Constants.kArmDistancePerPulseRadians);
     m_armEncoder.reset();
-    m_armPIDController.setTolerance(Constants.kArmDistanceTolerance);
+
+    m_armEncoderPos.setDistancePerRotation(Constants.kDutyCycleEncoderDistancePerRotRadians);
+    m_armPIDController.setTolerance(Constants.kArmDistanceToleranceRadiansPerSecond);
   }
 
   public void setArmSpeed(double speed) {
-    m_speed = speed;
+    m_speedRadiansPerSecond = speed;
   }
   
   public void setOperatingState() {
     m_state = State.OPERATING;
   }
 
-    m_armMotor.set(m_armPIDController.calculate(m_armEncoder.getRate(), speed));
   private void moveArmVel(double speed) {
+    m_armMotor.set(m_armPIDController.calculate(m_armEncoder.getRate(), speed));
   }
 
   public void indexArm() {
     m_state = State.CALIBRATING;
-    m_startTime = (double)RobotController.getFPGATime()/1000000;
-    moveArmVel(Constants.kCalibrationSpeed);
+    m_startTimeSeconds = (double)RobotController.getFPGATime()/1000000;
+    moveArmVel(Constants.kCalibrationSpeedRadiansPerSecond);
   }
 
   private boolean inTolerance(double input, double setPoint, double percentTolerance) {
@@ -65,23 +70,26 @@ public class arm extends SubsystemBase {
     SmartDashboard.putString("State:", m_state.toString());
     SmartDashboard.putNumber("Arm Speed:", m_armEncoder.getRate());
     SmartDashboard.putNumber("Arm Pos:", m_armEncoder.getDistance());
-    SmartDashboard.putNumber("Time:", (double)RobotController.getFPGATime()/1000000 - m_startTime);
-    SmartDashboard.putNumber("Target Speed:", m_speed);
-    SmartDashboard.putNumber("Speed difference:", m_speed - m_armEncoder.getRate());
+    SmartDashboard.putNumber("Time:", (double)RobotController.getFPGATime()/1000000 - m_startTimeSeconds);
+    SmartDashboard.putNumber("Target Speed:", m_speedRadiansPerSecond);
+    SmartDashboard.putNumber("Speed difference:", m_speedRadiansPerSecond - m_armEncoder.getRate());
 
     switch (m_state) {
       case CALIBRATING:
-        if ((m_armEncoder.getRate() <= 0.0 && m_armEncoder.getRate() >= -Constants.kCalibrationTolerance ||
-          m_armEncoder.getRate() >= 0.0 && m_armEncoder.getRate() <= Constants.kCalibrationTolerance) &&
-          (double)RobotController.getFPGATime()/1000000 - m_startTime >= Constants.kCalibrationDelay) {
+      {
+        double armSpeedRadiansPerSecond = m_armEncoder.getRate();
+        double currentTimeSeconds = (double)RobotController.getFPGATime()/1000000;
+        if ((Math.abs(armSpeedRadiansPerSecond) <= Constants.kCalibrationToleranceRadiansPerSecond) && 
+        (currentTimeSeconds - m_startTimeSeconds >= Constants.kCalibrationSecondsDelay)) {
           moveArmVel(0.0);
           m_armEncoder.reset();
           m_state = State.OPERATING;
         }
         break;
+      }
     
       case OPERATING:
-        moveArmVel(m_speed);
+        moveArmVel(m_speedRadiansPerSecond);
         break;
     }
   }

@@ -29,7 +29,7 @@ public class RobotContainer {
     m_arm.setDefaultCommand(
       new RunCommand(
         () -> {
-          m_arm.setArmSpeed(clampJoystick(m_controller.getRightX()) * Constants.kMaxVelocity);
+          m_arm.setArmSpeed(clampJoystick(m_controller.getRightX()) * Constants.kMaxVelocityRadiansPerSecond);
         }, m_arm)
     );
   }
