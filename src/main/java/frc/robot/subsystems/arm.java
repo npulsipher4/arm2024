@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import org.opencv.core.Mat;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -89,8 +91,15 @@ public class arm extends SubsystemBase {
       }
     
       case OPERATING:
+      {
+        double armPosRadians = m_armEncoder.getDistance();
         moveArmVel(m_speedRadiansPerSecond);
+        if (armPosRadians >= Constants.kAngleCutoffRadians && m_speedRadiansPerSecond < 0.0) {
+          moveArmVel(0.0);
+        }
         break;
+      }
+        
     }
   }
 }

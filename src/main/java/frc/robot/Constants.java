@@ -16,5 +16,6 @@ public class Constants {
     public static final double kCalibrationToleranceRadiansPerSecond = Math.PI / 365.0;
     public static final double kCalibrationSecondsDelay = 1.0;
     public static final double kAngle1Radians = Math.PI / 4.0;
+    public static final double kAngleCutoffRadians = 3.0 * Math.PI / 4.0;
 
 }
