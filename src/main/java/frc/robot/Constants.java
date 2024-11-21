@@ -12,7 +12,7 @@ public class Constants {
     public static final double kArmDistanceToleranceRadiansPerSecond = Math.PI / 64;
     public static final double kMaxVelocityRadiansPerSecond = Math.PI / 4.0;
     public static final double kJoystickTolerance = 0.05;
-    public static final double kCalibrationSpeedRadiansPerSecond = Math.PI / 18.0;
+    public static final double kCalibrationSpeedRadiansPerSecond = -Math.PI / 18.0;
     public static final double kCalibrationToleranceRadiansPerSecond = Math.PI / 365.0;
     public static final double kCalibrationSecondsDelay = 1.0;
     public static final double kAngle1Radians = Math.PI / 4.0;

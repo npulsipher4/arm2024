@@ -28,7 +28,7 @@ public class arm extends SubsystemBase {
   private enum State {
     CALIBRATING,
     OPERATING,
-    OUT_OF_SCOPE
+    AT_RIGHT_BOUND
   }
 
   private State m_state = State.CALIBRATING;
@@ -99,8 +99,19 @@ public class arm extends SubsystemBase {
         moveArmVel(m_velocityRadiansPerSecond);
         if (armPosRadians >= Constants.kAngleCutoffRadians && m_velocityRadiansPerSecond < 0.0) {
           moveArmVel(0.0);
+          m_state = State.AT_RIGHT_BOUND;
         }
         break;
+      }
+
+      case AT_RIGHT_BOUND:
+      if (m_velocityRadiansPerSecond > 0) {
+        moveArmVel(m_velocityRadiansPerSecond);
+      } else {
+        moveArmVel(0.0);
+      }
+      if (m_armEncoder.getDistance() < Constants.kAngleCutoffRadians) {
+        m_state = State.OPERATING;
       }
         
     }
