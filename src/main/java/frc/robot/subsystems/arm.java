@@ -17,13 +17,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class arm extends SubsystemBase {
-  Encoder m_armEncoder = new Encoder(Constants.kEncoderChannelA, Constants.kEncoderChannelB, false,  EncodingType.k4X);
+  Encoder m_armEncoder = new Encoder(Constants.kEncoderChannelA, Constants.kEncoderChannelB, true,  EncodingType.k4X);
   Spark m_armMotor = new Spark(Constants.kMotorChannel);
   PIDController m_armPIDController = new PIDController(Constants.kP, Constants.kI, Constants.kD);
   DutyCycleEncoder m_armEncoderPos = new DutyCycleEncoder(Constants.kDutyCycleEncoderChannel);
 
   double m_startTimeSeconds = 0.00;
-  double m_speedRadiansPerSecond = 0.0;
+  double m_velocityRadiansPerSecond = 0.0;
 
   private enum State {
     CALIBRATING,
@@ -39,6 +39,8 @@ public class arm extends SubsystemBase {
 
     m_armEncoderPos.setDistancePerRotation(Constants.kDutyCycleEncoderDistancePerRotRadians);
     m_armPIDController.setTolerance(Constants.kArmDistanceToleranceRadiansPerSecond);
+
+    m_armMotor.setInverted(true);
   }
 
   public void setArmSpeed(double speed) {
