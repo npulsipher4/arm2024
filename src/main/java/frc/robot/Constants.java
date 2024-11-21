@@ -8,7 +8,7 @@ public class Constants {
     public static final double kP = 1.6;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kArmDistancePerPulseRadians = 2.0 * Math.PI / 4096.0;
+    public static final double kArmDistancePerPulseRadians = 2.0 * Math.PI / 2048.0;
     public static final double kArmDistanceToleranceRadiansPerSecond = Math.PI / 64;
     public static final double kMaxVelocityRadiansPerSecond = Math.PI / 4.0;
     public static final double kJoystickTolerance = 0.05;

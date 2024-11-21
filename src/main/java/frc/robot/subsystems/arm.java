@@ -42,7 +42,7 @@ public class arm extends SubsystemBase {
   }
 
   public void setArmSpeed(double speed) {
-    m_speedRadiansPerSecond = speed;
+    m_velocityRadiansPerSecond = speed;
   }
   
   public void setOperatingState() {
@@ -73,8 +73,9 @@ public class arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Speed:", m_armEncoder.getRate());
     SmartDashboard.putNumber("Arm Pos:", m_armEncoder.getDistance());
     SmartDashboard.putNumber("Time:", (double)RobotController.getFPGATime()/1000000 - m_startTimeSeconds);
-    SmartDashboard.putNumber("Target Speed:", m_speedRadiansPerSecond);
-    SmartDashboard.putNumber("Speed difference:", m_speedRadiansPerSecond - m_armEncoder.getRate());
+    SmartDashboard.putNumber("Target Speed:", m_velocityRadiansPerSecond);
+    SmartDashboard.putNumber("Speed difference:", m_velocityRadiansPerSecond - m_armEncoder.getRate());
+    SmartDashboard.putNumber("Current Encoder Count: ", m_armEncoder.get());
 
     switch (m_state) {
       case CALIBRATING:
@@ -93,8 +94,8 @@ public class arm extends SubsystemBase {
       case OPERATING:
       {
         double armPosRadians = m_armEncoder.getDistance();
-        moveArmVel(m_speedRadiansPerSecond);
-        if (armPosRadians >= Constants.kAngleCutoffRadians && m_speedRadiansPerSecond < 0.0) {
+        moveArmVel(m_velocityRadiansPerSecond);
+        if (armPosRadians >= Constants.kAngleCutoffRadians && m_velocityRadiansPerSecond < 0.0) {
           moveArmVel(0.0);
         }
         break;
