@@ -97,7 +97,7 @@ public class arm extends SubsystemBase {
       {
         double armPosRadians = m_armEncoder.getDistance();
         moveArmVel(m_velocityRadiansPerSecond);
-        if (armPosRadians >= Constants.kAngleCutoffRadians && m_velocityRadiansPerSecond < 0.0) {
+        if (m_armEncoder.getDistance() >= Constants.kAngleCutoffRadians && m_velocityRadiansPerSecond > 0.0) {
           moveArmVel(0.0);
           m_state = State.AT_RIGHT_BOUND;
         }
@@ -105,7 +105,7 @@ public class arm extends SubsystemBase {
       }
 
       case AT_RIGHT_BOUND:
-      if (m_velocityRadiansPerSecond > 0) {
+      if (m_velocityRadiansPerSecond < 0) {
         moveArmVel(m_velocityRadiansPerSecond);
       } else {
         moveArmVel(0.0);
