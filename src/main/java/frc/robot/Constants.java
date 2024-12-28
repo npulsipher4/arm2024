@@ -4,7 +4,7 @@ public class Constants {
     public static final int kEncoderChannelB = 3;
     public static final int kDutyCycleEncoderChannel = 0;
     public static final double kDutyCycleEncoderDistancePerRotRadians = Math.PI / 2.0;
-    public static final int kMotorChannel = 0;
+    public static final int kMotorCANid = 1;
     public static final double kP = 1.0;
     public static final double kI = 0.005;
     public static final double kD = 0.0;

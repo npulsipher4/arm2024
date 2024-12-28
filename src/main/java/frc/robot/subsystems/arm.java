@@ -17,12 +17,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class arm extends SubsystemBase {
-  SparkFlex m_armMotor = new SparkFlex(Constants.kMotorChannel, MotorType.kBrushless);
+  SparkFlex m_armMotor = new SparkFlex(Constants.kMotorCANid, MotorType.kBrushless); // TODO: change motor channel to CAN id
   SparkFlexConfig m_armMotorConfig = new SparkFlexConfig();
   ExternalEncoderConfig m_armEncoderConfig = new ExternalEncoderConfig();
 
   PIDController m_armPIDController = new PIDController(Constants.kP, Constants.kI, Constants.kD);
-  RelativeEncoder m_armEncoder = m_armMotor.getEncoder();
+  RelativeEncoder m_armEncoder = m_armMotor.getExternalEncoder();
 
   double m_startTimeSeconds = 0.00;
   double m_velocityRadiansPerSecond = 0.0;
@@ -37,7 +37,7 @@ public class arm extends SubsystemBase {
 
   public arm() {
     // Motor / Encoder config
-    m_armEncoderConfig.positionConversionFactor(Constants.kArmPositionConversionFactor); //TODO: change to conversion factor to get radians 
+    m_armEncoderConfig.positionConversionFactor(Constants.kArmPositionConversionFactor); //TODO: change to conversion factor to get radians (Done?)
     m_armEncoderConfig.velocityConversionFactor(Constants.kArmVelocityConversionFactor);
     m_armMotorConfig.apply(m_armEncoderConfig);
     m_armMotor.configure(m_armMotorConfig, null, null);
